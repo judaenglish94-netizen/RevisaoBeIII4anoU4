@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JM English - The Water Cycle Quiz (Year 4)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fredoka:wght@600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --space-dark: #050b14;
+      --space-blue: #0b192e;
+      --accent-blue: #0284c7;
+      --dark-blue-text: #0b192e;
+      --card-bg: rgba(13, 27, 42, 0.94);
+      --card-border: rgba(255, 255, 255, 0.85);
+      --text-main: #f8f9fa;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
+
+    body {
+      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+      min-height: 100vh;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: 
+        radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 230px 190px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 300px 80px, #ffffff, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 350px 350px;
+      opacity: 0.5;
+      z-index: 0;
+    }
+
+    .brand-header {
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+
+    .custom-logo {
+      max-width: 180px;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 6px 15px rgba(0,0,0,0.6));
+      transition: transform 0.3s ease;
+    }
+
+    .custom-logo:hover { transform: scale(1.03); }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 300px;
+      height: 100%;
+      background: #0f172a;
+      box-shadow: 5px 0 25px rgba(0,0,0,0.8);
+      z-index: 1000;
+      transition: left 0.3s ease;
+      padding: 25px 20px;
+      overflow-y: auto;
+      border-right: 2px solid rgba(255,255,255,0.2);
+    }
+    .drawer.open { left: 0; }
+    .drawer-overlay {
+      position: fixed;
+      top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 999;
+      display: none;
+    }
+    .drawer-overlay.open { display: block; }
+
+    .grid-menu {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-top: 15px;
+    }
+    .grid-item {
+      padding: 10px 5px;
+      background: #1e293b;
+      color: #38bdf8;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.2s;
+    }
+    .grid-item:hover { border-color: #38bdf8; background: #334155; }
+    .grid-item.answered { background: #14532d; color: #4ade80; border-color: #22c55e; }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      border: 3px solid var(--card-border);
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(10px);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .menu-btn {
+      background: #1e293b;
+      border: 2px solid #ffffff;
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-btn:hover { background: #334155; transform: translateY(-1px); }
+
+    h1, h2, h3 { font-family: 'Fredoka', sans-serif; color: #ffffff; text-align: center; }
+
+    .ref-text-box {
+      background: #ffffff;
+      color: #1e293b;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border-left: 6px solid #0b192e;
+      line-height: 1.6;
+      font-size: 0.98rem;
+      max-height: 240px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #0b192e #e2e8f0;
+    }
+
+    .ref-text-box::-webkit-scrollbar {
+      width: 8px;
+    }
+    .ref-text-box::-webkit-scrollbar-track {
+      background: #e2e8f0;
+      border-radius: 8px;
+    }
+    .ref-text-box::-webkit-scrollbar-thumb {
+      background-color: #0b192e;
+      border-radius: 8px;
+    }
+    .ref-text-box::-webkit-scrollbar-thumb:hover {
+      background-color: #0284c7;
+    }
+
+    .ref-text-box h3 {
+      color: var(--dark-blue-text);
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.35rem;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .ref-text-box h4 {
+      color: #0284c7;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.15rem;
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+    .ref-text-box p { color: #334155; margin-bottom: 10px; }
+    .ref-text-box strong { color: var(--dark-blue-text); font-weight: 800; }
+    .ref-text-box em { color: #475569; font-style: italic; }
+
+    .btn {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      padding: 12px 30px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+    }
+    .btn:hover { background: linear-gradient(135deg, #0369a1 0%, #075985 100%); transform: translateY(-2px); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .options-grid { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+
+    .option-btn {
+      background: rgba(30, 41, 59, 0.7);
+      border: 2px solid #334155;
+      padding: 14px 20px;
+      border-radius: 14px;
+      text-align: left;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #f8f9fa;
+    }
+    .option-btn:hover { border-color: #38bdf8; background: rgba(51, 65, 85, 0.9); }
+    .option-btn.selected { border-color: #38bdf8; background: #0284c7; color: #ffffff; }
+    .option-btn.correct { background: #14532d !important; border-color: #22c55e !important; color: #ffffff !important; }
+    .option-btn.wrong { background: #7f1d1d !important; border-color: #ef4444 !important; color: #ffffff !important; }
+
+    .feedback-box {
+      margin-top: 15px;
+      padding: 16px;
+      border-radius: 14px;
+      font-weight: 600;
+      display: none;
+      line-height: 1.6;
+    }
+
+    .report-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid #38bdf8;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 20px;
+      text-align: left;
+    }
+    .report-card h3 { color: #38bdf8; text-align: left; margin-bottom: 12px; }
+    .report-card ul { margin-left: 20px; margin-top: 10px; }
+    .report-card li { margin-bottom: 8px; color: #cbd5e1; }
+
+    .nav-actions { display: flex; justify-content: space-between; margin-top: 25px; }
+
+    .progress-bar-wrap {
+      width: 100%;
+      background: #1e293b;
+      height: 10px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 1px solid #334155;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #0284c7);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+<div class="brand-header">
+  <img src="judalogo.png" alt="JM Logo" class="custom-logo">
+</div>
+
+<div class="drawer-overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="drawer" id="drawer">
+  <h3>Questions Menu</h3>
+  <p style="font-size: 0.85rem; text-align: center; margin-top: 5px; color: var(--text-muted);">Select a question to jump:</p>
+  <div class="grid-menu" id="menu-grid"></div>
+</div>
+
+<div class="container">
+  <div class="top-bar">
+    <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+    <span style="font-weight: 800; color: #38bdf8;" id="tracker-text">Science Quiz</span>
+  </div>
+
+  <!-- TELA INICIAL: TEXTO EXPLICATIVO COMPLETO E BOTÃO START QUIZ -->
+  <div id="start-screen">
+    <h1 style="font-size: 1.8rem; margin-bottom: 15px;">The Water Cycle</h1>
+    
+    <div class="ref-text-box" style="max-height: 340px;">
+      <h3>The Water Cycle (O Ciclo da Água)</h3>
+      
+      <p>A água do nosso planeta está em constante movimento. Esse processo contínuo é chamado de <strong>The Water Cycle</strong> (O Ciclo da Água). A <strong>temperature</strong> (temperatura), o <strong>heat</strong> (calor) e o frio fazem a água mudar de forma constantemente.</p>
+      
+      <h4>1. Evaporation (Evaporação)</h4>
+      <p>O <strong>sun</strong> (sol) faz a água ficar muito <strong>hot</strong> (quente) nos <strong>rivers</strong> (rios) e <strong>oceans</strong> (oceanos). Esse <strong>heat</strong> (calor) transforma a água líquida em <strong>water vapor</strong> (vapor de água), um gás que sobe para o <strong>sky</strong> (céu). Esse processo é a <strong>evaporation</strong> (evaporação).</p>
+      <p><em>Frase de exemplo: The sun makes water hot, and heat turns it into water vapor.</em></p>
+
+      <h4>2. Condensation (Condensação)</h4>
+      <p>No alto do <strong>sky</strong> (céu), a <strong>temperature</strong> (temperatura) é muito <strong>cold</strong> (fria). Quando o vapor de água fica <strong>cold</strong> (frio), ele muda de gás para pequenas gotas de água líquida e forma as <strong>clouds</strong> (nuvens). Esse processo é a <strong>condensation</strong> (condensação).</p>
+      <p><em>Frase de exemplo: Cold temperature in the sky turns vapor into clouds.</em></p>
+
+      <h4>3. Precipitation (Precipitação / Chuva)</h4>
+      <p>Quando as <strong>clouds</strong> (nuvens) ficam muito <strong>heavy</strong> (pesadas) e cheias de água, a água cai para a terra. Essa água cai como <strong>rain</strong> (chuva) ou <strong>snow</strong> (neve). Esse processo é a <strong>precipitation</strong> (precipitação).</p>
+      <p><em>Frase de exemplo: Rain falls from heavy clouds to the ground.</em></p>
+
+      <h4>4. Collection (Coleta / Acúmulo)</h4>
+      <p>A <strong>rain</strong> (chuva) cai na terra e a água corre de volta para os <strong>rivers</strong> (rios) e <strong>oceans</strong> (oceanos). Isso é a <strong>collection</strong> (coleta). Depois, a <strong>temperature</strong> sobe com o sol <strong>hot</strong> (quente) e o ciclo recomeça!</p>
+      <p><em>Frase de exemplo: Water goes back to rivers, and the cycle repeats.</em></p>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <button class="btn" onclick="startQuiz()">Start Quiz!</button>
+    </div>
+  </div>
+
+  <!-- TELA DO QUIZ: TEXTO FIXO NO TOPO DE TODAS AS QUESTÕES -->
+  <div id="quiz-screen" style="display: none;">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="ref-text-box" id="ref-box">
+      <h3>The Water Cycle (O Ciclo da Água)</h3>
+      <p>O <strong>Water Cycle</strong> é o movimento da água ajudado pela <strong>temperature</strong> (temperatura):</p>
+      <p>1. <strong>Evaporation</strong>: O <strong>sun</strong> deixa a água <strong>hot</strong> (quente). O <strong>heat</strong> (calor) faz a água virar <strong>water vapor</strong> (vapor) que sobe ao <strong>sky</strong> (céu).</p>
+      <p>2. <strong>Condensation</strong>: No alto do céu a <strong>temperature</strong> é <strong>cold</strong> (fria), e o vapor vira <strong>clouds</strong> (nuvens).</p>
+      <p>3. <strong>Precipitation</strong>: Quando as nuvens ficam <strong>heavy</strong> (pesadas), a <strong>rain</strong> (chuva) cai.</p>
+      <p>4. <strong>Collection</strong>: A água volta para <strong>rivers</strong> e <strong>oceans</strong>, e o ciclo recomeça!</p>
+    </div>
+
+    <h2 id="question-number">Question 1</h2>
+    <p id="question-text" style="font-size: 1.15rem; margin: 15px 0; font-weight: 700; text-align: center; color: #f8f9fa;"></p>
+
+    <div class="options-grid" id="options-container"></div>
+
+    <div style="text-align: center; margin-top: 15px;">
+      <button class="btn" id="check-btn" onclick="checkAnswer()">Check</button>
+    </div>
+
+    <div class="feedback-box" id="feedback-box"></div>
+
+    <div class="nav-actions">
+      <button class="btn" id="prev-btn" style="background: #334155; border-color: #64748b;" onclick="prevQuestion()">Previous</button>
+      <button class="btn" id="next-btn" style="background: #334155; border-color: #64748b;" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="result-screen" style="display: none; text-align: center;">
+    <h2 style="font-size: 2rem; color: #38bdf8;">Quiz Completed!</h2>
+    
+    <div style="margin: 20px 0;">
+      <p style="font-size: 1.2rem; color: #94a3b8;">Sua Nota Final:</p>
+      <div style="font-size: 3.5rem; font-family: 'Fredoka', sans-serif; color: #22c55e; margin: 10px 0;" id="final-grade">10.0</div>
+      <p style="font-size: 1.1rem;" id="score-details"></p>
+    </div>
+
+    <div class="report-card" id="report-card">
+      <h3>📋 Relatório de Desempenho e Foco de Estudo</h3>
+      <div id="report-content"></div>
+    </div>
+
+    <div style="margin-top: 25px;">
+      <button class="btn" onclick="restartQuiz()">Restart Quiz</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 10 Questões Objetivas com vocabulário simplificado (hot, cold, heat, temperature, sky, etc.)
+  const questions = [
+    {
+      category: 'evaporation',
+      q: "1. What makes the water in lakes and oceans HOT?",
+      options: ["The wind", "The moon", "The sun", "The clouds"],
+      correct: 2, // C
+      explain: "No texto: O <strong>sun</strong> (sol) deixa a água <strong>hot</strong> (quente).<br>Tradução: <em>'O sol deixa a água quente'</em>."
+    },
+    {
+      category: 'evaporation',
+      q: "2. When heat makes liquid water hot, it turns into water vapor. What is this called?",
+      options: ["Evaporation", "Collection", "Precipitation", "Freezing"],
+      correct: 0, // A
+      explain: "No texto: <strong>heat</strong> (calor) faz a água evaporar (<strong>evaporation</strong>).<br>Tradução: <em>'Evaporação é a água esquentando e virando vapor'</em>."
+    },
+    {
+      category: 'condensation',
+      q: "3. What is the temperature high in the sky?",
+      options: ["Very hot", "Very cold", "Warm like fire", "Very dusty"],
+      correct: 1, // B
+      explain: "No texto: A <strong>temperature</strong> no alto do céu é <strong>cold</strong> (fria).<br>Tradução: <em>'A temperatura no céu é muito fria'</em>."
+    },
+    {
+      category: 'condensation',
+      q: "4. When water vapor gets cold in the sky, it makes...",
+      options: ["small rocks", "hot fires", "dry sand", "clouds"],
+      correct: 3, // D
+      explain: "No texto: Quando o vapor fica <strong>cold</strong> (frio), ele forma as <strong>clouds</strong> (nuvens)."
+    },
+    {
+      category: 'precipitation',
+      q: "5. When clouds become heavy with water, what falls down to the ground?",
+      options: ["Dust", "Rain", "Wind", "Sunlight"],
+      correct: 1, // B
+      explain: "No texto: <strong>rain</strong> = chuva.<br>Tradução: <em>'A chuva (rain) cai para a terra quando a nuvem fica pesada'</em>."
+    },
+    {
+      category: 'precipitation',
+      q: "6. What is the word for rain or snow falling from the sky?",
+      options: ["Evaporation", "Collection", "Precipitation", "Condensation"],
+      correct: 2, // C
+      explain: "Vocabulário: <strong>Precipitation</strong>.<br>Tradução: <em>'Precipitação (chuva ou neve caindo do céu)'</em>."
+    },
+    {
+      category: 'collection',
+      q: "7. After it rains, where does the water go back to?",
+      options: ["Rivers and oceans", "The sun", "High clouds", "Space"],
+      correct: 0, // A
+      explain: "No texto: A água corre de volta para os <strong>rivers</strong> (rios) e <strong>oceans</strong> (oceanos)."
+    },
+    {
+      category: 'vocabulario',
+      q: "8. What happens when the heat of the sun touches water?",
+      options: ["Water gets colder", "Water freezes into ice", "Water gets hot and goes up to the sky", "Water disappears forever"],
+      correct: 2, // C
+      explain: "No texto: <strong>heat</strong> (calor) deixa a água <strong>hot</strong> (quente) e faz ela subir ao céu."
+    },
+    {
+      category: 'ciclo_geral',
+      q: "9. Does the water cycle stop, or does it repeat?",
+      options: ["It stops every night", "It repeats again and again", "It stops in summer", "It only happens once"],
+      correct: 1, // B
+      explain: "No texto: É um processo que <strong>repeats</strong> (se repete continuamente)."
+    },
+    {
+      category: 'vocabulario',
+      q: "10. What is the English word for 'nuvens' in the sky?",
+      options: ["Rivers", "Oceans", "Rain", "Clouds"],
+      correct: 3, // D
+      explain: "Vocabulário: <strong>clouds</strong> = nuvens no céu."
+    }
+  ];
+
+  let currentQ = 0;
+  let userAnswers = new Array(questions.length).fill(null);
+
+  function toggleMenu() {
+    document.getElementById('drawer').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+
+  function renderMenu() {
+    const grid = document.getElementById('menu-grid');
+    grid.innerHTML = '';
+    questions.forEach((_, idx) => {
+      const item = document.createElement('div');
+      item.className = 'grid-item' + (userAnswers[idx] !== null ? ' answered' : '');
+      item.innerText = idx + 1;
+      item.onclick = () => {
+        currentQ = idx;
+        loadQuestion();
+        toggleMenu();
+      };
+      grid.appendChild(item);
+    });
+  }
+
+  function startQuiz() {
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('quiz-screen').style.display = 'block';
+    renderMenu();
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    const q = questions[currentQ];
+
+    document.getElementById('question-number').innerText = `Question ${currentQ + 1} of ${questions.length}`;
+    document.getElementById('question-text').innerText = q.q;
+    document.getElementById('tracker-text').innerText = `Q${currentQ + 1} / 10`;
+    
+    const pct = ((currentQ + 1) / questions.length) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+    
+    const feedbackBox = document.getElementById('feedback-box');
+    feedbackBox.style.display = 'none';
+
+    document.getElementById('check-btn').disabled = false;
+    document.getElementById('prev-btn').disabled = currentQ === 0;
+
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerText = opt;
+      if (userAnswers[currentQ] === idx) {
+        btn.classList.add('selected');
+      }
+      btn.onclick = () => selectOption(idx);
+      container.appendChild(btn);
+    });
+
+    if (userAnswers[currentQ] !== null) {
+      showAnswerState();
+    }
+  }
+
+  function selectOption(idx) {
+    userAnswers[currentQ] = idx;
+    renderMenu();
+    const btns = document.querySelectorAll('.option-btn');
+    btns.forEach((b, i) => {
+      b.classList.toggle('selected', i === idx);
+    });
+  }
+
+  function checkAnswer() {
+    if (userAnswers[currentQ] === null) return;
+    showAnswerState();
+  }
+
+  function showAnswerState() {
+    const q = questions[currentQ];
+    const selected = userAnswers[currentQ];
+    const btns = document.querySelectorAll('.option-btn');
+    const feedbackBox = document.getElementById('feedback-box');
+
+    btns.forEach((btn, idx) => {
+      btn.onclick = null;
+      if (idx === q.correct) {
+        btn.classList.add('correct');
+      } else if (idx === selected) {
+        btn.classList.add('wrong');
+      }
+    });
+
+    if (selected === q.correct) {
+      feedbackBox.style.background = '#14532d';
+      feedbackBox.style.color = '#ffffff';
+      feedbackBox.innerHTML = '✔ <strong>Correto! Excellent job!</strong><br><br>' + q.explain;
+      confetti({ particleCount: 40, spread: 60, origin: { y: 0.7 } });
+    } else {
+      feedbackBox.style.background = '#7f1d1d';
+      feedbackBox.style.color = '#ffffff';
+      feedbackBox.innerHTML = '✖ <strong>Incorreto / Ops!</strong><br><br>' + q.explain;
+    }
+
+    feedbackBox.style.display = 'block';
+    document.getElementById('check-btn').disabled = true;
+  }
+
+  function nextQuestion() {
+    if (currentQ < questions.length - 1) {
+      currentQ++;
+      loadQuestion();
+    } else {
+      finishQuiz();
+    }
+  }
+
+  function prevQuestion() {
+    if (currentQ > 0) {
+      currentQ--;
+      loadQuestion();
+    }
+  }
+
+  function finishQuiz() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+    
+    let correctCount = 0;
+    let errorsByCategory = {
+      evaporation: 0,
+      condensation: 0,
+      precipitation: 0,
+      collection: 0,
+      vocabulario: 0,
+      ciclo_geral: 0
+    };
+
+    questions.forEach((q, idx) => {
+      if (userAnswers[idx] === q.correct) {
+        correctCount++;
+      } else {
+        if (errorsByCategory[q.category] !== undefined) {
+          errorsByCategory[q.category]++;
+        }
+      }
+    });
+
+    const grade = ((correctCount / questions.length) * 10).toFixed(1);
+    const gradeElem = document.getElementById('final-grade');
+    gradeElem.innerText = grade;
+
+    if (grade >= 7.0) {
+      gradeElem.style.color = "#22c55e";
+    } else if (grade >= 5.0) {
+      gradeElem.style.color = "#eab308";
+    } else {
+      gradeElem.style.color = "#ef4444";
+    }
+
+    document.getElementById('score-details').innerHTML = `Você acertou <strong>${correctCount}</strong> de <strong>${questions.length}</strong> questões.`;
+
+    const reportContent = document.getElementById('report-content');
+    let totalErrors = questions.length - correctCount;
+    let htmlReport = '';
+
+    if (totalErrors === 0) {
+      htmlReport = `<p style="color: #4ade80;"><strong>Sensacional! Desempenho Perfeito! 🎉</strong><br>Você dominou 100% dos conceitos do Ciclo da Água em inglês. Está pronto para tirar 10!</p>`;
+    } else {
+      htmlReport = `<p>Com base nos seus erros nesta atividade, aqui estão os tópicos para <strong>revisar no texto explicativo</strong>:</p><ul>`;
+
+      if (errorsByCategory.evaporation > 0) {
+        htmlReport += `<li><strong>Evaporation & Heat:</strong> Lembre que o <strong>heat</strong> (calor) do sol deixa a água <strong>hot</strong> (quente) e a transforma em vapor.</li>`;
+      }
+      if (errorsByCategory.condensation > 0) {
+        htmlReport += `<li><strong>Condensation & Cold:</strong> Revise que a <strong>temperature</strong> no céu é <strong>cold</strong> (fria), fazendo o vapor virar <strong>clouds</strong> (nuvens).</li>`;
+      }
+      if (errorsByCategory.precipitation > 0) {
+        htmlReport += `<li><strong>Precipitation:</strong> Quando a nuvem fica pesada, cai <strong>rain</strong> (chuva) ou neve.</li>`;
+      }
+      if (errorsByCategory.collection > 0) {
+        htmlReport += `<li><strong>Collection:</strong> A água da chuva volta para os <strong>rivers</strong> (rios) e <strong>oceans</strong> (oceanos).</li>`;
+      }
+      if (errorsByCategory.vocabulario > 0 || errorsByCategory.ciclo_geral > 0) {
+        htmlReport += `<li><strong>Vocabulário Básico:</strong> Repasse as palavras-chave da caixa (<em>hot, cold, heat, temperature, sky, clouds, rain, sun</em>).</li>`;
+      }
+
+      htmlReport += `</ul>`;
+    }
+
+    reportContent.innerHTML = htmlReport;
+
+    confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
+  }
+
+  function restartQuiz() {
+    userAnswers.fill(null);
+    currentQ = 0;
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('start-screen').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
